@@ -3,7 +3,7 @@ import 'package:host_babminton/core/database_service.dart';
 import 'package:host_babminton/data/models/session.dart';
 import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
-
+import 'package:host_babminton/data/models/attendance.dart';
 class CalendarController extends GetxController {
   var selectedTab = 0.obs;
 
@@ -49,11 +49,11 @@ class CalendarController extends GetxController {
       }
     }
 
-    upcomingSessions.value = _groupSessionsByMonth(upcomingList);
-    pastSessions.value = _groupSessionsByMonth(pastList);
+    upcomingSessions.value = await _groupSessionsByMonth(upcomingList);
+    pastSessions.value = await _groupSessionsByMonth(pastList);
   }
 
-  List<Map<String, dynamic>> _groupSessionsByMonth(List<Session> sessions) {
+  Future<List<Map<String, dynamic>>> _groupSessionsByMonth(List<Session> sessions) async {
     if (sessions.isEmpty) return [];
 
     final grouped = <String, List<Map<String, dynamic>>>{};
@@ -73,6 +73,8 @@ class CalendarController extends GetxController {
       if (session.status == SessionStatus.checkout) statusStr = 'Quyết toán';
       if (session.status == SessionStatus.closed) statusStr = 'Đã chốt';
 
+      final attendanceCount = await db.attendances.filter().session((q) => q.idEqualTo(session.id)).count();
+
       final item = {
         'id': session.id,
         'weekday': weekdayStr,
@@ -81,7 +83,7 @@ class CalendarController extends GetxController {
         'time': timeStr,
         'venue': session.venue.value?.name ?? 'Chưa rõ sân',
         'status': statusStr,
-        'attendance': '0/${session.maxPlayers}',
+        'attendance': '$attendanceCount/${session.maxPlayers}',
       };
 
       if (!grouped.containsKey(monthKey)) {

@@ -65,17 +65,18 @@ class CustomTextField extends StatelessWidget {
             color: const Color(0xFF14211A),
           ),
           decoration: InputDecoration(
+            isDense: true,
             filled: true,
             fillColor: Colors.white,
             hintText: placeholder,
             hintStyle: TextStyle(
-              fontSize: 17.sp,
+              fontSize: 14.sp,
               fontWeight: FontWeight.normal,
               color: const Color(0xFF68776F).withValues(alpha: 0.5),
             ),
             contentPadding: EdgeInsets.symmetric(
               horizontal: 16.w,
-              vertical: 14.h,
+              vertical: 12.h,
             ),
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(

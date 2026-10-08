@@ -52,129 +52,134 @@ class _ListTabState extends State<ListTab> {
       return Column(
         children: [
           Expanded(
-            child: CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                SliverToBoxAdapter(child: _buildTableHeader()),
-                SliverPadding(
-                  padding: EdgeInsets.only(bottom: 24.h),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final attendance = members[index];
-                      final memberName = attendance.member.value?.name ?? '';
-                      final isMale = attendance.isMale;
-                      final isPaid =
-                          attendance.paymentStatus == PaymentStatus.paid;
+            child: InteractiveViewer(
+              minScale: 0.2,
+              maxScale: 3.0,
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  SliverToBoxAdapter(child: _buildTableHeader()),
+                  SliverPadding(
+                    padding: EdgeInsets.only(bottom: 24.h),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final attendance = members[index];
+                        final memberName = attendance.member.value?.name ?? '';
+                        final isMale = attendance.isMale;
+                        final isPaid =
+                            attendance.paymentStatus == PaymentStatus.paid;
 
-                      return Dismissible(
-                        key: ValueKey(attendance.id),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          padding: EdgeInsets.only(right: 24.w),
-                          color: Colors.white,
-                          child: Container(
-                            width: 72.w,
-                            height: 56.h,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFFC8431B),
-                            ),
-                            alignment: Alignment.center,
-                            child: Icon(
-                              Icons.delete_outline,
-                              color: Colors.white,
-                              size: 24.w,
-                            ),
-                          ),
-                        ),
-                        onDismissed: (direction) {
-                          _deleteAttendance(attendance);
-                        },
-                        child: Container(
-                          height: 45.h,
-                          decoration: const BoxDecoration(
+                        return Dismissible(
+                          key: ValueKey(attendance.id),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: EdgeInsets.only(right: 24.w),
                             color: Colors.white,
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Color(0xFFE1E6E3),
-                                width: 1,
+                            child: Container(
+                              width: 72.w,
+                              height: 56.h,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFC8431B),
+                              ),
+                              alignment: Alignment.center,
+                              child: Icon(
+                                Icons.delete_outline,
+                                color: Colors.white,
+                                size: 24.w,
                               ),
                             ),
                           ),
-                          child: Row(
-                            children: [
-                              SizedBox(width: 16.w),
-                              SizedBox(
-                                width: 20.w,
-                                child: Text(
-                                  '${index + 1}',
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    color: const Color(0xFF14211A),
-                                  ),
+                          onDismissed: (direction) {
+                            _deleteAttendance(attendance);
+                          },
+                          child: Container(
+                            height: 45.h,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: Color(0xFFE1E6E3),
+                                  width: 1,
                                 ),
                               ),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                flex: 3,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8.w,
-                                      vertical: 4.h,
+                            ),
+                            child: Row(
+                              children: [
+                                SizedBox(width: 16.w),
+                                SizedBox(
+                                  width: 20.w,
+                                  child: Text(
+                                    '${index + 1}',
+                                    style: AppTextStyles.bodyMedium().copyWith(
+                                      color: const Color(0xFF14211A),
+                                      fontWeight: FontWeight.normal,
                                     ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF3EFD9),
-                                      borderRadius: BorderRadius.circular(6.r),
-                                    ),
-                                    child: Text(
-                                      memberName,
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF14211A),
+                                  ),
+                                ),
+                                SizedBox(width: 12.w),
+                                Expanded(
+                                  flex: 3,
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8.w,
+                                        vertical: 4.h,
                                       ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF3EFD9),
+                                        borderRadius: BorderRadius.circular(
+                                          6.r,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        memberName,
+                                        style: AppTextStyles.titleMedium(
+                                          color: const Color(0xFF14211A),
+                                        ).copyWith(fontSize: 14.sp),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 8.w),
-                              Expanded(
-                                flex: 2,
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: _buildGenderPill(
-                                    isMale ? 'Nam' : 'Nữ',
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 88.w,
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: InkWell(
-                                    onTap: () => controller.togglePaymentStatus(
-                                      attendance,
-                                    ),
-                                    borderRadius: BorderRadius.circular(100.r),
-                                    child: _buildStatusPill(
-                                      isPaid ? 'Đã TT' : 'Chưa TT',
+                                SizedBox(width: 8.w),
+                                Expanded(
+                                  flex: 2,
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: _buildGenderPill(
+                                      isMale ? 'Nam' : 'Nữ',
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 28.w),
-                            ],
+                                SizedBox(
+                                  width: 88.w,
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: InkWell(
+                                      onTap: () => controller
+                                          .togglePaymentStatus(attendance),
+                                      borderRadius: BorderRadius.circular(
+                                        100.r,
+                                      ),
+                                      child: _buildStatusPill(
+                                        isPaid ? 'Đã TT' : 'Chưa TT',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 28.w),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }, childCount: members.length),
+                        );
+                      }, childCount: members.length),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Container(
@@ -234,16 +239,16 @@ class _ListTabState extends State<ListTab> {
             SizedBox(height: 16.h),
             Text(
               'Chưa có ai trong buổi này',
-              style: TextStyle(
-                fontSize: 17.sp,
-                fontWeight: FontWeight.bold,
+              style: AppTextStyles.titleMedium(
                 color: const Color(0xFF14211A),
-              ),
+              ).copyWith(fontSize: 17.sp, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8.h),
             Text(
               'Thêm thành viên đã vote để bắt đầu',
-              style: TextStyle(fontSize: 15.sp, color: const Color(0xFF68776F)),
+              style: AppTextStyles.bodyLarge(
+                color: const Color(0xFF68776F),
+              ).copyWith(fontSize: 15.sp, fontWeight: FontWeight.normal),
             ),
             SizedBox(height: 24.h),
             Row(
@@ -320,9 +325,7 @@ class _ListTabState extends State<ListTab> {
     );
   }
 
-  final _headerStyle = TextStyle(
-    fontSize: 13.sp,
-    fontWeight: FontWeight.w600,
+  final _headerStyle = AppTextStyles.titleSmall3(
     color: const Color(0xFF14211A),
   );
 
@@ -493,12 +496,12 @@ class _AddMemberSheetState extends State<_AddMemberSheet> {
 
     await widget.controller.loadSession(session.id);
     Get.back();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Đã thêm $name'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(
+    //     content: Text('Đã thêm $name'),
+    //     behavior: SnackBarBehavior.floating,
+    //   ),
+    // );
   }
 
   @override
@@ -525,15 +528,13 @@ class _AddMemberSheetState extends State<_AddMemberSheet> {
                 ),
               ),
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 12.h),
             Center(
               child: Text(
                 'Thêm ${isMale ? "Nam" : "Nữ"}',
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
+                style: AppTextStyles.titleMedium(
                   color: const Color(0xFF14211A),
-                ),
+                ).copyWith(fontSize: 18.sp, fontWeight: FontWeight.bold),
               ),
             ),
             SizedBox(height: 16.h),
@@ -541,20 +542,17 @@ class _AddMemberSheetState extends State<_AddMemberSheet> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Ghi nhận thành viên đã vote tham gia',
-                  style: TextStyle(
-                    fontSize: 13.sp,
+                  'Thành viên đã vote tham gia',
+                  style: AppTextStyles.labelLarge2(
                     color: const Color(0xFF68776F),
-                  ),
+                  ).copyWith(fontWeight: FontWeight.normal),
                 ),
                 Obx(
                   () => Text(
                     '${widget.controller.attendanceList.length}/${widget.controller.currentSession.value?.maxPlayers ?? 16} chỗ',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF14211A),
-                    ),
+                    style: AppTextStyles.titleSmall3(
+                      color: const Color.fromARGB(221, 20, 33, 26),
+                    ).copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -562,29 +560,26 @@ class _AddMemberSheetState extends State<_AddMemberSheet> {
             SizedBox(height: 16.h),
             Text(
               'Tên',
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF14211A),
-              ),
+              style: AppTextStyles.titleSmall3(color: const Color(0xFF14211A)),
             ),
             SizedBox(height: 8.h),
             SizedBox(
-              height: 48.h,
               child: TextField(
                 controller: textController,
                 autofocus: true,
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
                   hintText: 'Nhập tên',
-                  hintStyle: TextStyle(
-                    fontSize: 15.sp,
+                  hintStyle: AppTextStyles.bodyLarge(
                     color: const Color(0xFF68776F).withValues(alpha: 0.5),
-                  ),
+                  ).copyWith(fontSize: 15.sp, fontWeight: FontWeight.normal),
                   filled: true,
                   fillColor: Colors.white,
                   isDense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 12.h,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12.r),
                     borderSide: const BorderSide(color: Color(0xFFD5DBD8)),
@@ -601,66 +596,15 @@ class _AddMemberSheetState extends State<_AddMemberSheet> {
                 onChanged: (val) => setState(() {}),
               ),
             ),
-            SizedBox(height: 16.h),
-            Text(
-              'Hội viên đã lưu',
-              style: TextStyle(fontSize: 13.sp, color: const Color(0xFF68776F)),
-            ),
-            SizedBox(height: 12.h),
-            ConstrainedBox(
-              constraints: BoxConstraints(maxHeight: 140.h),
-              child: SingleChildScrollView(
-                child: Wrap(
-                  spacing: 8.w,
-                  runSpacing: 8.h,
-                  children: savedMembers
-                      .where(
-                        (m) =>
-                            m.isMale == isMale &&
-                            (textController.text.isEmpty ||
-                                m.name.toLowerCase().contains(
-                                  textController.text.toLowerCase(),
-                                )),
-                      )
-                      .map(
-                        (m) => GestureDetector(
-                          onTap: () {
-                            textController.text = m.name;
-                            setState(() {});
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16.w,
-                              vertical: 8.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF4F6F8),
-                              borderRadius: BorderRadius.circular(100.r),
-                            ),
-                            child: Text(
-                              m.name,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w500,
-                                color: const Color(0xFF68776F),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
-            ),
             SizedBox(height: 24.h),
             SizedBox(
               width: double.infinity,
-              height: 52.h,
+              height: 48.h,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF146C43),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
                   elevation: 0,
                 ),
@@ -669,15 +613,12 @@ class _AddMemberSheetState extends State<_AddMemberSheet> {
                     : null,
                 child: Text(
                   'Thêm',
-                  style: TextStyle(
-                    fontSize: 17.sp,
-                    fontWeight: FontWeight.bold,
+                  style: AppTextStyles.titleMedium(
                     color: Colors.white,
-                  ),
+                  ).copyWith(fontSize: 17.sp, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-            SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
           ],
         ),
       ),

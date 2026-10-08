@@ -25,14 +25,14 @@ class CalendarScreen extends GetView<CalendarController> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Lịch', style: AppTextStyles.titleLarge()),
-                  IconButton(
-                    icon: Icon(
-                      Icons.more_horiz,
-                      size: 28.w,
-                      color: const Color(0xFF14211A),
-                    ),
-                    onPressed: () {},
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.more_horiz,
+                  //     size: 28.w,
+                  //     color: const Color(0xFF14211A),
+                  //   ),
+                  //   onPressed: () {},
+                  // ),
                 ],
               ),
             ),
@@ -55,8 +55,8 @@ class CalendarScreen extends GetView<CalendarController> {
 
                 return ListView.builder(
                   padding: EdgeInsets.only(
-                    left: 20.w,
-                    right: 20.w,
+                    left: 10.w,
+                    right: 10.w,
                     bottom: 100.h,
                   ),
                   itemCount: data.length,
@@ -110,11 +110,9 @@ class CalendarScreen extends GetView<CalendarController> {
           SizedBox(height: 16.h),
           Text(
             'Chưa có buổi nào',
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.bold,
+            style: AppTextStyles.labelLarge(
               color: const Color(0xFF14211A),
-            ),
+            ).copyWith(fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 8.h),
           Text(

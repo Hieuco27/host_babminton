@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:host_babminton/core/text_styles.dart';
 
 class CustomSegmentTab extends StatefulWidget {
   final ValueChanged<int> onChanged;
@@ -43,7 +44,7 @@ class _CustomSegmentTabState extends State<CustomSegmentTab> {
                   borderRadius: BorderRadius.circular(12.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
+                      color: Colors.black.withValues(alpha: 0.2),
                       blurRadius: 4,
                       offset: const Offset(0, 1),
                     ),
@@ -52,9 +53,8 @@ class _CustomSegmentTabState extends State<CustomSegmentTab> {
               : null,
           child: Text(
             text,
-            style: TextStyle(
-              fontSize: 15.sp,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+            style: AppTextStyles.titleMedium16().copyWith(
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
               color: isActive
                   ? const Color(0xFF146C43)
                   : const Color(0xFF68776F),

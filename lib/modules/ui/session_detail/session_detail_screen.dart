@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:host_babminton/data/models/session.dart';
+import 'package:host_babminton/core/text_styles.dart';
 
 import 'session_detail_controller.dart';
 import 'widgets/detail_segment_tab.dart';
@@ -14,192 +15,210 @@ class SessionDetailScreen extends GetView<SessionDetailController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F6F8),
-      body: SafeArea(
-        bottom: false,
-        child: NestedScrollView(
-          headerSliverBuilder: (context, innerBoxIsScrolled) {
-            return [
-              SliverAppBar(
-                pinned: true,
-                backgroundColor: const Color(0xFFF4F6F8),
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                leading: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back_ios_new,
-                    size: 20.w,
-                    color: const Color(0xFF14211A),
-                  ),
-                  onPressed: () => Get.back(),
-                ),
-                titleSpacing: 0,
-                title: Text(
-                  'S0810',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF14211A),
-                  ),
-                ),
-                actions: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.more_horiz,
-                      size: 24.w,
-                      color: const Color(0xFF14211A),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF4F6F8),
+        resizeToAvoidBottomInset: false,
+        body: RepaintBoundary(
+          key: controller.repaintBoundaryKey,
+          child: SafeArea(
+            bottom: false,
+            child: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverAppBar(
+                    pinned: true,
+                    backgroundColor: const Color(0xFFF4F6F8),
+                    elevation: 0,
+                    scrolledUnderElevation: 0,
+                    leading: IconButton(
+                      icon: Icon(
+                        Icons.arrow_back_ios_new,
+                        size: 20.w,
+                        color: const Color(0xFF14211A),
+                      ),
+                      onPressed: () => Get.back(),
                     ),
-                    onPressed: () {},
-                  ),
-                ],
-                bottom: PreferredSize(
-                  preferredSize: Size.fromHeight(40.h),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 12.w,
-                      vertical: 8.h,
+                    titleSpacing: 0,
+                    title: Obx(
+                      () => Text(
+                        controller.currentSession.value?.code ?? '',
+                        style: AppTextStyles.titleLarge().copyWith(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF14211A),
+                        ),
+                      ),
                     ),
-                    child: Obx(
-                      () => DetailSegmentTab(
-                        tabController: controller.tabController,
-                        selectedIndex: controller.selectedTab.value,
+                    actions: [
+                      IconButton(
+                        icon: Icon(
+                          Icons.more_horiz,
+                          size: 24.w,
+                          color: const Color(0xFF14211A),
+                        ),
+                        onPressed: () => controller.captureFullList(context),
+                      ),
+                    ],
+                    bottom: PreferredSize(
+                      preferredSize: Size.fromHeight(40.h),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 12.w),
+                        child: Obx(
+                          () => DetailSegmentTab(
+                            tabController: controller.tabController,
+                            selectedIndex: controller.selectedTab.value,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
-              const SliverToBoxAdapter(child: Divider(thickness: 1)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 8.h,
-                  ),
-                  child: Obx(() {
-                    final session = controller.currentSession.value;
-                    if (session == null) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                  const SliverToBoxAdapter(child: Divider(thickness: 1)),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w),
+                      child: Obx(() {
+                        final session = controller.currentSession.value;
+                        if (session == null) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
 
-                    final venue = session.venue.value;
-                    String statusStr = 'Nháp';
-                    if (session.status == SessionStatus.checkout)
-                      statusStr = 'Quyết toán';
-                    if (session.status == SessionStatus.closed)
-                      statusStr = 'Đã chốt';
+                        final venue = session.venue.value;
+                        String statusStr = 'Nháp';
+                        if (session.status == SessionStatus.checkout)
+                          statusStr = 'Quyết toán';
+                        if (session.status == SessionStatus.closed)
+                          statusStr = 'Đã chốt';
 
-                    // Format date & time
-                    int weekday = session.date.weekday;
-                    String weekdayStr = weekday == 7 ? 'CN' : 'T${weekday + 1}';
-                    String title =
-                        'Cầu lông $weekdayStr ${session.date.day.toString().padLeft(2, '0')}/${session.date.month.toString().padLeft(2, '0')}';
-                    String timeStr =
-                        '$weekdayStr, ${session.date.day.toString().padLeft(2, '0')}/${session.date.month.toString().padLeft(2, '0')} · ${session.startTime}–${session.endTime}';
+                        // Format date & time
+                        int weekday = session.date.weekday;
+                        String weekdayStr = weekday == 7
+                            ? 'CN'
+                            : 'T${weekday + 1}';
+                        String timeStr =
+                            '$weekdayStr, ${session.date.day.toString().padLeft(2, '0')}/${session.date.month.toString().padLeft(2, '0')} · ${session.startTime} – ${session.endTime}';
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              title,
-                              style: TextStyle(
-                                fontSize: 22.sp,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF14211A),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 12.w,
-                                vertical: 4.h,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFE8ECEA),
-                                borderRadius: BorderRadius.circular(100.r),
-                              ),
-                              child: Text(
-                                statusStr,
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF68776F),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          timeStr,
-                          style: TextStyle(
-                            fontSize: 15.sp,
-                            color: const Color(0xFF14211A),
+                        return Container(
+                          padding: EdgeInsets.all(8.w),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16.r),
+                            border: Border.all(color: const Color(0xFFE8ECEA)),
                           ),
-                        ),
-                        SizedBox(height: 12.h),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.location_on_outlined,
-                              size: 20.w,
-                              color: const Color(0xFF68776F),
-                            ),
-                            SizedBox(width: 8.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    venue?.name ?? 'Chưa rõ sân',
-                                    style: TextStyle(
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF14211A),
+                                  Expanded(
+                                    child: Text(
+                                      timeStr,
+                                      style: AppTextStyles.bodyMedium()
+                                          .copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  SizedBox(height: 2.h),
-                                  Text(
-                                    venue?.address ?? '',
-                                    style: TextStyle(
-                                      fontSize: 13.sp,
-                                      color: const Color(0xFF68776F),
+                                  SizedBox(width: 8.w),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12.w,
+                                      vertical: 4.h,
                                     ),
-                                  ),
-                                  if (session.courtNumbers != null &&
-                                      session.courtNumbers!.isNotEmpty) ...[
-                                    SizedBox(height: 4.h),
-                                    Text(
-                                      'Sân số: ${session.courtNumbers}',
-                                      style: TextStyle(
-                                        fontSize: 13.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF146C43),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE8ECEA),
+                                      borderRadius: BorderRadius.circular(
+                                        100.r,
                                       ),
                                     ),
-                                  ],
+                                    child: Text(
+                                      statusStr,
+                                      style: AppTextStyles.titleSmall3(
+                                        color: const Color(0xFF68776F),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }),
-                ),
+                              SizedBox(height: 12.h),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.location_on_outlined,
+                                    size: 20.w,
+                                    color: const Color(0xFF68776F),
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  Expanded(
+                                    child: RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: venue?.name ?? 'Chưa rõ sân',
+                                            style:
+                                                AppTextStyles.titleSmall3(
+                                                  color: const Color(
+                                                    0xFF14211A,
+                                                  ),
+                                                ).copyWith(
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
+                                          if (venue?.address.isNotEmpty == true)
+                                            TextSpan(
+                                              text: ' • ${venue!.address}',
+                                              style:
+                                                  AppTextStyles.titleSmall3(
+                                                    color: const Color(
+                                                      0xFF14211A,
+                                                    ),
+                                                  ).copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                          if (session
+                                                  .courtNumbers
+                                                  ?.isNotEmpty ==
+                                              true)
+                                            TextSpan(
+                                              text:
+                                                  ' • Sân số: ${session.courtNumbers}',
+                                              style: AppTextStyles.titleSmall3(
+                                                color: const Color(0xFF146C43),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: _ProgressBarDelegate(),
+                  ),
+                ];
+              },
+              body: TabBarView(
+                controller: controller.tabController,
+                children: const [ListTab(), AttendanceTab(), CheckoutTab()],
               ),
-              SliverPersistentHeader(
-                pinned: true,
-                delegate: _ProgressBarDelegate(),
-              ),
-            ];
-          },
-          body: TabBarView(
-            controller: controller.tabController,
-            children: const [ListTab(), AttendanceTab(), CheckoutTab()],
+            ),
           ),
         ),
       ),
@@ -209,9 +228,9 @@ class SessionDetailScreen extends GetView<SessionDetailController> {
 
 class _ProgressBarDelegate extends SliverPersistentHeaderDelegate {
   @override
-  double get minExtent => 44.h;
+  double get minExtent => 50.h;
   @override
-  double get maxExtent => 44.h;
+  double get maxExtent => 50.h;
 
   @override
   Widget build(
@@ -239,7 +258,7 @@ class _ProgressBarDelegate extends SliverPersistentHeaderDelegate {
 
             String label = '';
             if (controller.selectedTab.value == 0) {
-              label = 'Điểm danh $memberCount/$maxPlayers';
+              label = 'Số lượng $memberCount/$maxPlayers';
             } else if (controller.selectedTab.value == 1) {
               label = 'Đã điểm danh $memberCount/$maxPlayers';
             } else {
@@ -252,9 +271,7 @@ class _ProgressBarDelegate extends SliverPersistentHeaderDelegate {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.w600,
+                  style: AppTextStyles.titleSmall3(
                     color: const Color(0xFF146C43),
                   ),
                 ),

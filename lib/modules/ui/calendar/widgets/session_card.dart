@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:get/get.dart';
+import 'package:host_babminton/core/text_styles.dart';
+import 'package:host_babminton/modules/ui/calendar/calendar_controller.dart';
 
 class SessionCard extends StatelessWidget {
   final Map<String, dynamic> data;
@@ -11,10 +14,15 @@ class SessionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.toNamed('/session-detail', arguments: data),
+      onTap: () async {
+        await Get.toNamed('/session-detail', arguments: data);
+        if (Get.isRegistered<CalendarController>()) {
+          Get.find<CalendarController>().loadSessions();
+        }
+      },
       child: Container(
         margin: EdgeInsets.only(bottom: 12.h),
-        padding: EdgeInsets.all(12.w),
+        padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16.r),
@@ -26,7 +34,7 @@ class SessionCard extends StatelessWidget {
             // Date Badge
             Container(
               width: 56.w,
-              height: 60.h,
+              height: 56.h,
               decoration: BoxDecoration(
                 color: const Color(0xFFE8ECEA),
                 borderRadius: BorderRadius.circular(12.r),
@@ -36,16 +44,14 @@ class SessionCard extends StatelessWidget {
                 children: [
                   Text(
                     data['weekday'],
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w600,
+                    style: AppTextStyles.labelMedium().copyWith(
                       color: const Color(0xFF68776F),
                     ),
                   ),
                   Text(
                     data['day'],
-                    style: TextStyle(
-                      fontSize: 20.sp,
+                    style: AppTextStyles.titleLarge().copyWith(
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF14211A),
                     ),
@@ -53,7 +59,7 @@ class SessionCard extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: 8.w),
             // Middle Info
             Expanded(
               child: Column(
@@ -61,31 +67,55 @@ class SessionCard extends StatelessWidget {
                 children: [
                   Text(
                     data['title'],
-                    style: TextStyle(
-                      fontSize: 17.sp,
+                    style: AppTextStyles.labelLarge().copyWith(
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF14211A),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4.h),
-                  Text(
-                    data['time'],
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: const Color(0xFF14211A),
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/calendar/time.svg',
+                        width: 15.w,
+                        height: 15.h,
+                      ),
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        child: Text(
+                          data['time'],
+                          style: AppTextStyles.labelLarge(
+                            color: const Color(0xFF14211A),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 2.h),
-                  Text(
-                    data['venue'],
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: const Color(0xFF68776F),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  SizedBox(height: 4.h),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        'assets/images/calendar/location.svg',
+                        width: 15.w,
+                        height: 15.h,
+                      ),
+                      SizedBox(width: 4.w),
+                      Expanded(
+                        child: Text(
+                          data['venue'],
+                          style: AppTextStyles.labelLarge(
+                            color: const Color(0xFF68776F),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -108,11 +138,9 @@ class SessionCard extends StatelessWidget {
                     SizedBox(width: 4.w),
                     Text(
                       data['attendance'],
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyles.labelLarge(
                         color: const Color(0xFF14211A),
-                      ),
+                      ).copyWith(fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -161,11 +189,7 @@ class SessionCard extends StatelessWidget {
           ],
           Text(
             status,
-            style: TextStyle(
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w600,
-              color: textColor,
-            ),
+            style: AppTextStyles.labelMedium().copyWith(color: textColor),
           ),
         ],
       ),

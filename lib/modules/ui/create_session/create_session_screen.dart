@@ -13,6 +13,7 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFF4F6F8),
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -28,70 +29,54 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
           onPressed: () => Get.back(),
         ),
         titleSpacing: 0,
-        title: Text('Tạo buổi chơi', style: AppTextStyles.headlineSmall()),
+        title: Text('Tạo buổi chơi', style: AppTextStyles.titleMediumBlack()),
       ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: EdgeInsets.only(
-              left: 16.w,
-              right: 16.w,
-              top: 8.h,
-              bottom: 120.h,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          left: 16.w,
+          right: 16.w,
+          top: 8.h,
+          bottom: 24.h + MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          children: [
+            _buildWhenCard(context),
+            _buildWhereCard(),
+            _buildHowMuchCard(),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: EdgeInsets.only(
+          left: 16.w,
+          right: 16.w,
+          top: 16.h,
+          bottom: MediaQuery.of(context).padding.bottom + 16.h,
+        ),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF4F6F8),
+          border: Border(
+            top: BorderSide(color: const Color(0xFFE5E9E7), width: 1.h),
+          ),
+        ),
+        child: SizedBox(
+          height: 52.h,
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF146C43),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.r),
+              ),
+              elevation: 0,
             ),
-            child: Column(
-              children: [
-                _buildWhenCard(context),
-                _buildWhereCard(),
-                _buildHowMuchCard(),
-              ],
+            onPressed: controller.saveSession,
+            child: Text(
+              'Lưu buổi chơi',
+              style: AppTextStyles.titleMediumAppBar(),
             ),
           ),
-          // Sticky Bottom Bar
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding: EdgeInsets.only(
-                left: 16.w,
-                right: 16.w,
-                top: 16.h,
-                bottom: MediaQuery.of(context).padding.bottom + 16.h,
-              ),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.0),
-                    Colors.white,
-                    Colors.white,
-                  ],
-                  stops: const [0.0, 0.4, 1.0],
-                ),
-              ),
-              child: SizedBox(
-                height: 52.h,
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF146C43),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.r),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: controller.saveSession,
-                  child: Text(
-                    'Lưu buổi chơi',
-                    style: AppTextStyles.titleMediumAppBar(),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -107,10 +92,13 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
               label: 'Ngày',
               isRequired: true,
               readOnly: true,
+              placeholder: 'Chọn ngày',
               controller: TextEditingController(
-                text: DateFormat(
-                  'dd/MM/yyyy',
-                ).format(controller.selectedDate.value),
+                text: controller.selectedDate.value != null
+                    ? DateFormat(
+                        'dd/MM/yyyy',
+                      ).format(controller.selectedDate.value!)
+                    : '',
               ),
               suffixIcon: Icon(
                 Icons.calendar_today,
@@ -138,9 +126,11 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
                     label: 'Giờ bắt đầu',
                     isRequired: true,
                     readOnly: true,
+                    placeholder: 'Chọn giờ',
                     controller: TextEditingController(
-                      text:
-                          '${controller.startTime.value.hour.toString().padLeft(2, '0')}:${controller.startTime.value.minute.toString().padLeft(2, '0')}',
+                      text: controller.startTime.value != null
+                          ? '${controller.startTime.value!.hour.toString().padLeft(2, '0')}:${controller.startTime.value!.minute.toString().padLeft(2, '0')}'
+                          : '',
                     ),
                     suffixIcon: Icon(
                       Icons.access_time,
@@ -150,7 +140,9 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
                     onTap: () async {
                       final time = await showTimePicker(
                         context: context,
-                        initialTime: controller.startTime.value,
+                        initialTime:
+                            controller.startTime.value ??
+                            const TimeOfDay(hour: 19, minute: 0),
                       );
                       if (time != null) controller.startTime.value = time;
                     },
@@ -165,9 +157,11 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
                     isRequired: true,
                     readOnly: true,
                     errorText: controller.timeError.value,
+                    placeholder: 'Chọn giờ',
                     controller: TextEditingController(
-                      text:
-                          '${controller.endTime.value.hour.toString().padLeft(2, '0')}:${controller.endTime.value.minute.toString().padLeft(2, '0')}',
+                      text: controller.endTime.value != null
+                          ? '${controller.endTime.value!.hour.toString().padLeft(2, '0')}:${controller.endTime.value!.minute.toString().padLeft(2, '0')}'
+                          : '',
                     ),
                     suffixIcon: Icon(
                       Icons.access_time,
@@ -177,7 +171,9 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
                     onTap: () async {
                       final time = await showTimePicker(
                         context: context,
-                        initialTime: controller.endTime.value,
+                        initialTime:
+                            controller.endTime.value ??
+                            const TimeOfDay(hour: 21, minute: 0),
                       );
                       if (time != null) controller.endTime.value = time;
                     },
@@ -240,15 +236,16 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
                     ),
                     child: Text(
                       controller.savedVenues[index]['name']!,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                        color: isSelected
-                            ? Colors.white
-                            : const Color(0xFF14211A),
-                      ),
+                      style:
+                          AppTextStyles.labelLarge(
+                            color: isSelected
+                                ? Colors.white
+                                : const Color(0xFF14211A),
+                          ).copyWith(
+                            fontWeight: isSelected
+                                ? FontWeight.w600
+                                : FontWeight.w400,
+                          ),
                     ),
                   ),
                 );
@@ -258,7 +255,7 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
           SizedBox(height: 4.h),
           CustomTextField(
             label: 'Địa chỉ',
-            placeholder: 'Ví dụ: 118 Phan Xích Long, Q. Phú Nhuận',
+            placeholder: 'Ví dụ: 120 Định Công',
             controller: controller.addressController,
           ),
         ],
@@ -291,7 +288,6 @@ class CreateSessionScreen extends GetView<CreateSessionController> {
                   label: 'Số chỗ tối đa',
                   isRequired: true,
                   placeholder: '16',
-
                   controller: controller.maxPlayersController,
                   keyboardType: TextInputType.number,
                 ),

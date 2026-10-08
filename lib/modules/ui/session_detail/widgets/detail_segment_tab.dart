@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:host_babminton/core/text_styles.dart';
 
 class DetailSegmentTab extends StatelessWidget {
   final TabController tabController;
@@ -52,9 +53,7 @@ class DetailSegmentTab extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             text,
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+            style: AppTextStyles.bodyMedium().copyWith(
               color: isActive
                   ? const Color(0xFF146C43)
                   : const Color(0xFF68776F),

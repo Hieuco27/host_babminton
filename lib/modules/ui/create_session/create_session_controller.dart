@@ -8,9 +8,9 @@ import 'package:host_babminton/data/models/session.dart';
 import 'package:host_babminton/data/models/venue.dart';
 
 class CreateSessionController extends GetxController {
-  var selectedDate = DateTime(2026, 10, 7).obs;
-  var startTime = const TimeOfDay(hour: 19, minute: 0).obs;
-  var endTime = const TimeOfDay(hour: 21, minute: 0).obs;
+  Rx<DateTime?> selectedDate = Rx<DateTime?>(null);
+  Rx<TimeOfDay?> startTime = Rx<TimeOfDay?>(null);
+  Rx<TimeOfDay?> endTime = Rx<TimeOfDay?>(null);
 
   final venueNameController = TextEditingController();
   final addressController = TextEditingController();
@@ -29,12 +29,14 @@ class CreateSessionController extends GetxController {
   var timeError = ''.obs;
 
   String get sessionCode {
-    return 'S${DateFormat('ddMM').format(selectedDate.value)}';
+    if (selectedDate.value == null) return 'S...';
+    return 'S${DateFormat('ddMM').format(selectedDate.value!)}';
   }
 
   int get totalHours {
-    int startMinutes = startTime.value.hour * 60 + startTime.value.minute;
-    int endMinutes = endTime.value.hour * 60 + endTime.value.minute;
+    if (startTime.value == null || endTime.value == null) return 0;
+    int startMinutes = startTime.value!.hour * 60 + startTime.value!.minute;
+    int endMinutes = endTime.value!.hour * 60 + endTime.value!.minute;
     if (endMinutes <= startMinutes) return 0;
     return ((endMinutes - startMinutes) / 60).round();
   }
@@ -66,11 +68,18 @@ class CreateSessionController extends GetxController {
       isValid = false;
     }
 
-    int startMinutes = startTime.value.hour * 60 + startTime.value.minute;
-    int endMinutes = endTime.value.hour * 60 + endTime.value.minute;
-    if (endMinutes <= startMinutes) {
-      timeError.value = 'Giờ kết thúc phải sau giờ bắt đầu';
+    if (selectedDate.value == null ||
+        startTime.value == null ||
+        endTime.value == null) {
+      timeError.value = 'Vui lòng chọn đầy đủ ngày giờ';
       isValid = false;
+    } else {
+      int startMinutes = startTime.value!.hour * 60 + startTime.value!.minute;
+      int endMinutes = endTime.value!.hour * 60 + endTime.value!.minute;
+      if (endMinutes <= startMinutes) {
+        timeError.value = 'Giờ kết thúc phải sau giờ bắt đầu';
+        isValid = false;
+      }
     }
 
     if (!isValid) return;
@@ -79,13 +88,13 @@ class CreateSessionController extends GetxController {
     final isar = await db;
 
     String startTimeStr =
-        '${startTime.value.hour.toString().padLeft(2, '0')}:${startTime.value.minute.toString().padLeft(2, '0')}';
+        '${startTime.value!.hour.toString().padLeft(2, '0')}:${startTime.value!.minute.toString().padLeft(2, '0')}';
     String endTimeStr =
-        '${endTime.value.hour.toString().padLeft(2, '0')}:${endTime.value.minute.toString().padLeft(2, '0')}';
+        '${endTime.value!.hour.toString().padLeft(2, '0')}:${endTime.value!.minute.toString().padLeft(2, '0')}';
 
     final newSession = Session(
       code: sessionCode,
-      date: selectedDate.value,
+      date: selectedDate.value!,
       startTime: startTimeStr,
       endTime: endTimeStr,
       numberOfCourts:

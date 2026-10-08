@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:host_babminton/data/models/attendance.dart';
+import 'package:host_babminton/core/text_styles.dart';
 import '../session_detail_controller.dart';
 
 class AttendanceTab extends GetView<SessionDetailController> {
   const AttendanceTab({super.key});
 
-  Future<void> _updateStatus(Attendance attendance, AttendanceStatus status) async {
+  Future<void> _updateStatus(
+    Attendance attendance,
+    AttendanceStatus status,
+  ) async {
     await controller.db.writeTxn(() async {
       attendance.attendanceStatus = status;
       await controller.db.attendances.put(attendance);
@@ -39,8 +43,12 @@ class AttendanceTab extends GetView<SessionDetailController> {
     return Obx(() {
       final members = controller.attendanceList;
 
-      int presentCount = members.where((m) => m.attendanceStatus == AttendanceStatus.present).length;
-      int absentCount = members.where((m) => m.attendanceStatus == AttendanceStatus.absent).length;
+      int presentCount = members
+          .where((m) => m.attendanceStatus == AttendanceStatus.present)
+          .length;
+      int absentCount = members
+          .where((m) => m.attendanceStatus == AttendanceStatus.absent)
+          .length;
       int votedCount = presentCount + absentCount;
 
       return CustomScrollView(
@@ -56,7 +64,11 @@ class AttendanceTab extends GetView<SessionDetailController> {
                     width: double.infinity,
                     height: 48.h,
                     child: ElevatedButton(
-                      onPressed: members.any((m) => m.attendanceStatus == AttendanceStatus.notVoted)
+                      onPressed:
+                          members.any(
+                            (m) =>
+                                m.attendanceStatus == AttendanceStatus.notVoted,
+                          )
                           ? _markAllPresent
                           : null,
                       style: ElevatedButton.styleFrom(
@@ -68,10 +80,8 @@ class AttendanceTab extends GetView<SessionDetailController> {
                       ),
                       child: Text(
                         'Có mặt tất cả',
-                        style: TextStyle(
+                        style: AppTextStyles.titleMediumBlack().copyWith(
                           fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF14211A),
                         ),
                       ),
                     ),
@@ -114,7 +124,7 @@ class AttendanceTab extends GetView<SessionDetailController> {
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: const Color(0xFFE1E6E3)),
       ),
-      padding: EdgeInsets.symmetric(vertical: 16.h),
+      padding: EdgeInsets.symmetric(vertical: 8.h),
       child: Row(
         children: [
           Expanded(child: _buildCounterItem(voted.toString(), 'Đã vote')),
@@ -132,7 +142,7 @@ class AttendanceTab extends GetView<SessionDetailController> {
       children: [
         Text(
           count,
-          style: TextStyle(
+          style: AppTextStyles.titleLarge().copyWith(
             fontSize: 24.sp,
             fontWeight: FontWeight.bold,
             color: const Color(0xFF14211A),
@@ -141,8 +151,7 @@ class AttendanceTab extends GetView<SessionDetailController> {
         SizedBox(height: 4.h),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 13.sp,
+          style: AppTextStyles.bodyMedium().copyWith(
             color: const Color(0xFF68776F),
           ),
         ),
@@ -158,8 +167,8 @@ class AttendanceTab extends GetView<SessionDetailController> {
     final gender = isMale ? 'Nam' : 'Nữ';
 
     return Container(
-      height: 72.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      height: 64.h,
+      padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -170,10 +179,8 @@ class AttendanceTab extends GetView<SessionDetailController> {
               children: [
                 Text(
                   name,
-                  style: TextStyle(
-                    fontSize: 16.sp,
+                  style: AppTextStyles.titleMediumBlack().copyWith(
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF14211A),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -182,15 +189,18 @@ class AttendanceTab extends GetView<SessionDetailController> {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
                   decoration: BoxDecoration(
-                    color: isMale ? const Color(0xFFDCEAFF) : const Color(0xFFFFE1ED),
+                    color: isMale
+                        ? const Color(0xFFDCEAFF)
+                        : const Color(0xFFFFE1ED),
                     borderRadius: BorderRadius.circular(100.r),
                   ),
                   child: Text(
                     gender,
-                    style: TextStyle(
-                      fontSize: 11.sp,
+                    style: AppTextStyles.labelSmall().copyWith(
                       fontWeight: FontWeight.w600,
-                      color: isMale ? const Color(0xFF1459B3) : const Color(0xFFB0245E),
+                      color: isMale
+                          ? const Color(0xFF1459B3)
+                          : const Color(0xFFB0245E),
                     ),
                   ),
                 ),
@@ -206,7 +216,8 @@ class AttendanceTab extends GetView<SessionDetailController> {
                 isSelected: isPresent,
                 selectedColor: const Color(0xFF146C43),
                 selectedTextColor: Colors.white,
-                onTap: () => _updateStatus(attendance, AttendanceStatus.present),
+                onTap: () =>
+                    _updateStatus(attendance, AttendanceStatus.present),
               ),
               SizedBox(width: 8.w),
               _buildAttendanceButton(
@@ -235,27 +246,27 @@ class AttendanceTab extends GetView<SessionDetailController> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 90.w, // reduced slightly to fit smaller screens
-        height: 44.h,
+        width: 94.w, // reduced slightly to fit smaller screens
+        height: 36.h,
         decoration: BoxDecoration(
           color: isSelected ? selectedColor : Colors.white,
           borderRadius: BorderRadius.circular(24.r),
-          border: isSelected ? null : Border.all(color: const Color(0xFFE1E6E3), width: 1.5),
+          border: isSelected
+              ? null
+              : Border.all(color: const Color(0xFFE1E6E3), width: 1.5),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (isSelected) ...[
-              Icon(icon, size: 16.w, color: selectedTextColor),
-              SizedBox(width: 4.w),
+              Icon(icon, size: 14.w, color: selectedTextColor),
+              SizedBox(width: 2.w),
             ],
             Text(
               text,
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
+              style: AppTextStyles.labelLarge(
                 color: isSelected ? selectedTextColor : const Color(0xFF14211A),
-              ),
+              ).copyWith(fontWeight: FontWeight.w600),
             ),
           ],
         ),
